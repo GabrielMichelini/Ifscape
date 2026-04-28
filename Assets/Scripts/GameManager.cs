@@ -41,10 +41,30 @@ public class GameManager : MonoBehaviour
 
     public void GameOver()
     {
+        // Impede que o jogo tente matar o personagem duas vezes se ele bater em dois armários seguidos
+        if (!jogoRodando) return; 
+
         jogoRodando = false;
-        telaGameOver.SetActive(true);
+        
+        // Para o estudante e desliga os controles dele
         playerScript.forwardSpeed = 0;
         playerScript.enabled = false;
+
+        // Puxa o Animator que está no modelo 3D e ativa o gatilho da morte ("Die")
+        Animator anim = playerScript.GetComponentInChildren<Animator>();
+        if (anim != null)
+        {
+            anim.SetTrigger("Die");
+        }
+
+        // Em vez de ativar a tela na hora, espera 2 segundos e chama a função MostrarTela
+        Invoke("MostrarTela", 2f); 
+    }
+
+    // Função nova que o código chama automaticamente depois do atraso
+    void MostrarTela()
+    {
+        telaGameOver.SetActive(true);
     }
 
     public void ReiniciarJogo()
