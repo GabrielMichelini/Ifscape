@@ -12,6 +12,11 @@ public class GameManager : MonoBehaviour
     private float pontuacao;
     public float dificuldade = 1f; // O jogo começa na dificuldade 1
 
+    // --- Sistema de Moedas ---
+    [Header("Sistema de Moedas")]
+    public TextMeshProUGUI textoMoedas;
+    private int moedasColetadas = 0;
+
     private bool jogoRodando = true;
 
     void Start()
@@ -19,6 +24,7 @@ public class GameManager : MonoBehaviour
         telaGameOver.SetActive(false);
         Time.timeScale = 1f; 
         pontuacao = 0;
+        moedasColetadas = 0; // Zera as moedas ao iniciar o jogo
     }
 
     void Update()
@@ -70,5 +76,17 @@ public class GameManager : MonoBehaviour
     public void ReiniciarJogo()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    // --- NOVA FUNÇÃO: ADICIONAR MOEDAS ---
+    public void AdicionarMoeda(int valor)
+    {
+        moedasColetadas += valor;
+        
+        // Atualiza o texto na tela
+        if (textoMoedas != null)
+        {
+            textoMoedas.text = "Moedas: " + moedasColetadas.ToString();
+        }
     }
 }

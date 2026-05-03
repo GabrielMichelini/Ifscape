@@ -141,6 +141,7 @@ GameObject:
   - component: {fileID: 757285003283621221}
   - component: {fileID: 1842092959128661287}
   - component: {fileID: 1416382744109995185}
+  - component: {fileID: 8832172554034587918}
   m_Layer: 0
   m_Name: ChaoEscola
   m_TagString: Untagged
@@ -253,6 +254,25 @@ MonoBehaviour:
   - {fileID: 8489472270378336486}
   - {fileID: 1324604870426003438}
   zonaSegura: 40
+--- !u!114 &8832172554034587918
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7244124678029382820}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f97fbc38926a7b947a5aa3c28b0cc612, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moedaPrefab: {fileID: 5998957075273373501, guid: 10bce50abfce90e429fbf00b896fdb71,
+    type: 3}
+  chanceDeNascer: 50
+  quantidadePorLinha: 5
+  distanciaEntreMoedas: 2
+  alturaDaMoeda: 1
+  laneDistance: 3
 --- !u!1 &7706690885195732212
 GameObject:
   m_ObjectHideFlags: 0

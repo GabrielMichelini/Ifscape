@@ -116,4 +116,22 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
+
+    // --- SISTEMA DE COLETA (MOEDAS) ---
+    void OnTriggerEnter(Collider outro)
+    {
+        // Verifica se encostamos numa Moeda
+        if (outro.gameObject.CompareTag("Moeda"))
+        {
+            // Avisa o GameManager para somar 1
+            GameManager gm = FindObjectOfType<GameManager>();
+            if (gm != null)
+            {
+                gm.AdicionarMoeda(1);
+            }
+            
+            // Destrói a moeda da tela
+            Destroy(outro.gameObject);
+        }
+    }
 }
