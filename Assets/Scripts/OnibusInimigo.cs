@@ -3,12 +3,16 @@ using UnityEngine;
 public class OnibusInimigo : MonoBehaviour
 {
     public float velocidadeExtra = 15f; 
+    public float raioDoRadar = 3f; 
+    
+    // --- NOVO: Espaço para a sua partícula ---
+    public GameObject particulaBatida; 
+
     private PlayerController player;
 
     void Start()
     {
         player = FindObjectOfType<PlayerController>();
-        // Aumentei o tempo de vida para garantir que ele ultrapasse o jogador antes de sumir
         Destroy(gameObject, 10f);
     }
 
@@ -17,16 +21,31 @@ public class OnibusInimigo : MonoBehaviour
         if (player != null && player.enabled)
         {
             float velocidadeTotal = player.forwardSpeed + velocidadeExtra;
-            // O Space.World é a mágica: obriga o ônibus a ir reto no eixo Z do mapa!
             transform.Translate(Vector3.forward * velocidadeTotal * Time.deltaTime, Space.World);
+            
+            float distanciaProAJ = Vector3.Distance(transform.position, player.transform.position);
+            if (distanciaProAJ < 3f)
+            {
+                FindObjectOfType<GameManager>().GameOver();
+            }
         }
-    }
 
-    void OnTriggerEnter(Collider outro)
-    {
-        if (outro.CompareTag("Player"))
+        Collider[] objetosNoRadar = Physics.OverlapSphere(transform.position, raioDoRadar);
+        foreach (Collider obj in objetosNoRadar)
         {
-            FindObjectOfType<GameManager>().GameOver();
+            AlvoDoOnibus alvo = obj.GetComponentInParent<AlvoDoOnibus>();
+            
+            if (alvo != null)
+            {
+                // --- NOVO: Cria a explosão EXATAMENTE na posição do armário ---
+                if (particulaBatida != null)
+                {
+                    Instantiate(particulaBatida, alvo.transform.position, Quaternion.identity);
+                }
+
+                // E depois destrói o armário
+                Destroy(alvo.gameObject);
+            }
         }
     }
 }

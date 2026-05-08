@@ -515,7 +515,7 @@ GameObject:
   - component: {fileID: -3404420486604184774}
   m_Layer: 0
   m_Name: schoolbus
-  m_TagString: Untagged
+  m_TagString: Onibus
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -603,7 +603,7 @@ BoxCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7098814568628868465}
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 5.70228, y: 1.4419615, z: 1.5309907}
@@ -621,6 +621,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   velocidadeExtra: 40
+  raioDoRadar: 0.8
+  particulaBatida: {fileID: 9017973178397477612, guid: 9457f2a8b86a2664da35b8e5fea03615,
+    type: 3}
 --- !u!1 &8193950507501390671
 GameObject:
   m_ObjectHideFlags: 0
