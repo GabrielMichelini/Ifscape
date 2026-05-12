@@ -93,7 +93,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: b9991ccb7d04d4547bf348db667b0848, type: 2}
+  - {fileID: 2100000, guid: 1620ae4cb22cbf44aa51efe66dd42ae9, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -142,6 +142,7 @@ GameObject:
   - component: {fileID: 1842092959128661287}
   - component: {fileID: 1416382744109995185}
   - component: {fileID: 8832172554034587918}
+  - component: {fileID: 1245851365506445556}
   m_Layer: 0
   m_Name: ChaoEscola
   m_TagString: Untagged
@@ -197,7 +198,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 6fbe7e5f0a99ed64da73531e7c7f8f14, type: 2}
+  - {fileID: 2100000, guid: 1620ae4cb22cbf44aa51efe66dd42ae9, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -270,6 +271,18 @@ MonoBehaviour:
   distanciaEntreMoedas: 2
   alturaDaMoeda: 1
   laneDistance: 3
+--- !u!114 &1245851365506445556
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7244124678029382820}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11059083aee9b5f4f889fa1fba636f53, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7706690885195732212
 GameObject:
   m_ObjectHideFlags: 0
@@ -394,7 +407,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: b9991ccb7d04d4547bf348db667b0848, type: 2}
+  - {fileID: 2100000, guid: 1620ae4cb22cbf44aa51efe66dd42ae9, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

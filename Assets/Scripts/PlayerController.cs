@@ -7,6 +7,7 @@ public class PlayerController : MonoBehaviour
     private Vector3 moveVector;
     public Animator animator;
 
+    // Essa variável continua existindo, mas agora ela dita a "velocidade da esteira" para o resto do mundo!
     public float forwardSpeed = 15f; 
     public float laneDistance = 3f; 
     public float jumpForce = 8f;
@@ -27,7 +28,6 @@ public class PlayerController : MonoBehaviour
         controller = GetComponent<CharacterController>();
         if (animator == null) animator = GetComponentInChildren<Animator>();
 
-        // Salva as proporções originais para voltar ao normal depois da cambalhota
         originalHeight = controller.height;
         originalCenter = controller.center;
     }
@@ -49,7 +49,7 @@ public class PlayerController : MonoBehaviour
         // --- PULO E GRAVIDADE ---
         if (controller.isGrounded)
         {
-            verticalVelocity = -1f; // Mantém o pé no chão
+            verticalVelocity = -1f; 
             if (animator != null) animator.SetBool("isGrounded", true);
 
             // Pulo
@@ -69,7 +69,6 @@ public class PlayerController : MonoBehaviour
             verticalVelocity += gravity * Time.deltaTime;
             if (animator != null) animator.SetBool("isGrounded", false);
 
-            // Força a rolada rápida para baixo (Fast Fall)
             if ((Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S)) && !isRolling)
             {
                 verticalVelocity = -jumpForce; 
@@ -80,7 +79,9 @@ public class PlayerController : MonoBehaviour
         // --- APLICA O MOVIMENTO ---
         moveVector.x = xMovement;
         moveVector.y = verticalVelocity;
-        moveVector.z = forwardSpeed;
+        
+        // A GRANDE MUDANÇA: O Z (frente) agora é ZERO. O AJ não corre mais para frente fisicamente.
+        moveVector.z = 0f; 
 
         controller.Move(moveVector * Time.deltaTime);
     }
@@ -91,13 +92,11 @@ public class PlayerController : MonoBehaviour
         isRolling = true;
         if (animator != null) animator.SetTrigger("Roll");
 
-        // Abaixa a cápsula
         controller.height = rollHeight;
         controller.center = new Vector3(originalCenter.x, rollHeight / 2f, originalCenter.z);
 
         yield return new WaitForSeconds(rollDuration);
 
-        // Levanta a cápsula
         controller.height = originalHeight;
         controller.center = originalCenter;
         
@@ -120,17 +119,13 @@ public class PlayerController : MonoBehaviour
     // --- SISTEMA DE COLETA (MOEDAS) ---
     void OnTriggerEnter(Collider outro)
     {
-        // Verifica se encostamos numa Moeda
         if (outro.gameObject.CompareTag("Moeda"))
         {
-            // Avisa o GameManager para somar 1
             GameManager gm = FindObjectOfType<GameManager>();
             if (gm != null)
             {
                 gm.AdicionarMoeda(1);
             }
-            
-            // Destrói a moeda da tela
             Destroy(outro.gameObject);
         }
     }
