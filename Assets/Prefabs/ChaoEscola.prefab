@@ -93,7 +93,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 1620ae4cb22cbf44aa51efe66dd42ae9, type: 2}
+  - {fileID: 2100000, guid: c6f59a98fee13eb4492bc5a30eaeaaca, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -141,7 +141,6 @@ GameObject:
   - component: {fileID: 757285003283621221}
   - component: {fileID: 1842092959128661287}
   - component: {fileID: 1416382744109995185}
-  - component: {fileID: 8832172554034587918}
   - component: {fileID: 1245851365506445556}
   m_Layer: 0
   m_Name: ChaoEscola
@@ -158,8 +157,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7244124678029382820}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 10, y: 0.1, z: 30}
+  m_LocalPosition: {x: 0, y: -0.18, z: 0}
+  m_LocalScale: {x: 10, y: 0.1, z: 25}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7922191140384405287}
@@ -198,7 +197,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 1620ae4cb22cbf44aa51efe66dd42ae9, type: 2}
+  - {fileID: 2100000, guid: 6fbe7e5f0a99ed64da73531e7c7f8f14, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -245,32 +244,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9305c08d209dbaa478f2b72c1f35f838, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  obstaculoPrefab: {fileID: 3040289247577919987, guid: bade0fff86c910f4d8278b9592fa397b,
+  prefabArmario: {fileID: 3040289247577919987, guid: bade0fff86c910f4d8278b9592fa397b,
     type: 3}
-  pontosDeSpawn:
-  - {fileID: 9112669658448385970}
-  - {fileID: 8489472270378336486}
-  - {fileID: 1324604870426003438}
-  zonaSegura: 40
---- !u!114 &8832172554034587918
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7244124678029382820}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f97fbc38926a7b947a5aa3c28b0cc612, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  moedaPrefab: {fileID: 5998957075273373501, guid: 10bce50abfce90e429fbf00b896fdb71,
+  prefabMoeda: {fileID: 5998957075273373501, guid: 10bce50abfce90e429fbf00b896fdb71,
     type: 3}
-  chanceDeNascer: 66
-  quantidadePorLinha: 5
-  distanciaEntreMoedas: 2
-  alturaDaMoeda: 1
-  laneDistance: 3
+  rotacaoYArmario: 90
 --- !u!114 &1245851365506445556
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -407,7 +385,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 1620ae4cb22cbf44aa51efe66dd42ae9, type: 2}
+  - {fileID: 2100000, guid: c6f59a98fee13eb4492bc5a30eaeaaca, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

@@ -1,54 +1,85 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class GeradorObstaculos : MonoBehaviour
 {
-    public GameObject obstaculoPrefab; 
-    public Transform[] pontosDeSpawn;  
-    public float zonaSegura = 40f; 
+    [Header("Prefabs dos Objetos")]
+    public GameObject prefabArmario; 
+    public GameObject prefabMoeda; // NOVO: Arraste o Prefab da sua moeda aqui!
 
-    private GameManager gm;
+    [Header("Ajuste de Rotação do Armário")]
+    [Tooltip("Se o armário nascer de costas ou de lado, mude esse número no Inspector (ex: 0, 90, 180, 270)")]
+    public float rotacaoYArmario = 0f; 
 
-    void Start()
+    private List<Transform> pontosDeSpawn = new List<Transform>(); 
+    private List<GameObject> objetosInstanciados = new List<GameObject>(); // Guarda tudo para limpar depois
+
+    void Awake()
     {
-        // Acha o GameManager para saber em qual dificuldade o jogo está
-        gm = FindObjectOfType<GameManager>();
+        ConfigurarPontos();
+    }
 
-        if (transform.position.z < zonaSegura) return; 
-
-        // 1. A CHANCE DE VAZIO DIMINUI COM O TEMPO
-        // Começa em 40%, mas se a dificuldade for 2, cai para 20%, gerando muito mais armários.
-        float chanceVazio = 40f / (gm != null ? gm.dificuldade : 1f);
-        if (Random.Range(0, 100) < chanceVazio) return;
-
-        // 2. QUANTOS ARMÁRIOS VÃO NASCER? (Bloquear 1 ou 2 pistas)
-        int qtdObstaculos = 1;
-        
-        // Se a dificuldade já passou de 1.5, tem 30% de chance de nascer 2 armários lado a lado!
-        if (gm != null && gm.dificuldade > 1.5f && Random.Range(0, 100) < 30) 
+    void ConfigurarPontos()
+    {
+        pontosDeSpawn.Clear();
+        foreach (Transform filho in transform)
         {
-            qtdObstaculos = 2; 
-        }
-
-        // Sorteia a primeira pista e cria o armário
-        int pista1 = Random.Range(0, pontosDeSpawn.Length);
-        CriarArmario(pista1);
-
-        // Se o jogo decidiu que são 2 armários, cria o segundo em uma pista diferente
-        if (qtdObstaculos == 2)
-        {
-            int pista2 = Random.Range(0, pontosDeSpawn.Length);
-            while (pista2 == pista1) // Garante que não vai nascer um dentro do outro
+            if (filho.name.StartsWith("Ponto"))
             {
-                pista2 = Random.Range(0, pontosDeSpawn.Length);
+                pontosDeSpawn.Add(filho);
             }
-            CriarArmario(pista2);
         }
     }
 
-    // Função separada apenas para organizar a criação e impedir que o armário estique
-    void CriarArmario(int indicePista)
+    public void GerarNovoObstaculo()
     {
-        GameObject novoObstaculo = Instantiate(obstaculoPrefab, pontosDeSpawn[indicePista].position, pontosDeSpawn[indicePista].rotation);
-        novoObstaculo.transform.SetParent(transform, true);
+        LimparObstaculos();
+
+        // Garante que os pontos estão carregados
+        if (pontosDeSpawn.Count == 0) ConfigurarPontos();
+        if (pontosDeSpawn.Count == 0) return;
+
+        // 1. Sorteia uma pista para ser a do Obstáculo (Armário)
+        int pistaDoArmario = Random.Range(0, pontosDeSpawn.Count);
+
+        // Calcula a chance do armário aparecer com base na dificuldade
+        float chanceDoArmario = 0.4f + (GameManager.instance.dificuldade * 0.05f);
+
+        if (Random.value < chanceDoArmario)
+        {
+            if (pontosDeSpawn[pistaDoArmario] != null)
+            {
+                // Cria o armário usando o ângulo customizado que você escolheu no Inspector
+                GameObject armario = Instantiate(prefabArmario, pontosDeSpawn[pistaDoArmario].position, Quaternion.Euler(0, rotacaoYArmario, 0));
+                armario.transform.SetParent(this.transform);
+                objetosInstanciados.Add(armario);
+            }
+        }
+
+        // 2. SISTEMA DE MOEDAS: Nas pistas que não têm armário, tenta gerar moedas!
+        for (int i = 0; i < pontosDeSpawn.Count; i++)
+        {
+            // Se essa pista não for a pista que escolhemos para o armário...
+            if (i != pistaDoArmario && pontosDeSpawn[i] != null)
+            {
+                // 60% de chance de nascer uma moeda nas pistas livres
+                if (Random.value < 0.6f && prefabMoeda != null)
+                {
+                    GameObject moeda = Instantiate(prefabMoeda, pontosDeSpawn[i].position, Quaternion.identity);
+                    moeda.transform.SetParent(this.transform);
+                    objetosInstanciados.Add(moeda);
+                }
+            }
+        }
+    }
+
+    public void LimparObstaculos()
+    {
+        // Destrói todos os armários e moedas antigos antes de criar novos
+        foreach (GameObject obj in objetosInstanciados)
+        {
+            if (obj != null) Destroy(obj);
+        }
+        objetosInstanciados.Clear();
     }
 }

@@ -7,21 +7,25 @@ public class PlayerController : MonoBehaviour
     private Vector3 moveVector;
     public Animator animator;
 
-    // Essa variável continua existindo, mas agora ela dita a "velocidade da esteira" para o resto do mundo!
+    [Header("Movimentação")]
     public float forwardSpeed = 15f; 
     public float laneDistance = 3f; 
     public float jumpForce = 8f;
     public float gravity = -20f;
     public float sideSpeed = 15f;
 
-    private int desiredLane = 1; 
-    private float verticalVelocity;
-
+    [Header("Configuração de Rolagem")]
+    public float rollHeight = 0.5f;
+    public float rollDuration = 1.0f;
     private bool isRolling = false;
     private float originalHeight;
     private Vector3 originalCenter;
-    public float rollHeight = 0.5f;
-    public float rollDuration = 1.0f;
+
+    [Header("Sensor de Dano")]
+    public float distanciaDeteccao = 0.6f;
+
+    private int desiredLane = 1; 
+    private float verticalVelocity;
 
     void Start()
     {
@@ -34,6 +38,18 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        if (!GameManager.instance.jogoRodando) return;
+
+        // --- SENSOR A LASER CONTRA ARMÁRIOS ---
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position + Vector3.up * 0.5f, Vector3.forward, out hit, distanciaDeteccao))
+        {
+            if (hit.collider.CompareTag("Obstaculo") || hit.collider.transform.root.CompareTag("Obstaculo"))
+            {
+                GameManager.instance.GameOver();
+            }
+        }
+
         // --- CONTROLES DE PISTA ---
         if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
             desiredLane = Mathf.Clamp(desiredLane + 1, 0, 2);
@@ -41,7 +57,6 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
             desiredLane = Mathf.Clamp(desiredLane - 1, 0, 2);
 
-        // Movimento lateral suave
         float targetX = (desiredLane - 1) * laneDistance;
         float newX = Mathf.Lerp(transform.position.x, targetX, Time.deltaTime * sideSpeed);
         float xMovement = (newX - transform.position.x) / Time.deltaTime;
@@ -52,19 +67,17 @@ public class PlayerController : MonoBehaviour
             verticalVelocity = -1f; 
             if (animator != null) animator.SetBool("isGrounded", true);
 
-            // Pulo
             if ((Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.Space)) && !isRolling)
             {
                 verticalVelocity = jumpForce;
                 if (animator != null) animator.SetTrigger("Jump");
             }
-            // Rolada
             else if ((Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S)) && !isRolling)
             {
                 StartCoroutine(Roll());
             }
         }
-        else // Se estiver no ar
+        else 
         {
             verticalVelocity += gravity * Time.deltaTime;
             if (animator != null) animator.SetBool("isGrounded", false);
@@ -79,14 +92,11 @@ public class PlayerController : MonoBehaviour
         // --- APLICA O MOVIMENTO ---
         moveVector.x = xMovement;
         moveVector.y = verticalVelocity;
-        
-        // A GRANDE MUDANÇA: O Z (frente) agora é ZERO. O AJ não corre mais para frente fisicamente.
-        moveVector.z = 0f; 
+        moveVector.z = 0f; // AJ não corre fisicamente para frente
 
         controller.Move(moveVector * Time.deltaTime);
     }
 
-    // --- SISTEMA DE ROLADA ---
     private IEnumerator Roll()
     {
         isRolling = true;
@@ -99,34 +109,20 @@ public class PlayerController : MonoBehaviour
 
         controller.height = originalHeight;
         controller.center = originalCenter;
-        
         isRolling = false;
     }
 
-    // --- SISTEMA DE COLISÃO (MORTE) ---
-    void OnControllerColliderHit(ControllerColliderHit hit)
-    {
-        if (hit.gameObject.CompareTag("Obstaculo"))
-        {
-            GameManager gm = FindObjectOfType<GameManager>();
-            if (gm != null)
-            {
-                gm.GameOver();
-            }
-        }
-    }
-
-    // --- SISTEMA DE COLETA (MOEDAS) ---
+    // --- SENSOR PARA MOEDAS ---
     void OnTriggerEnter(Collider outro)
     {
         if (outro.gameObject.CompareTag("Moeda"))
         {
-            GameManager gm = FindObjectOfType<GameManager>();
-            if (gm != null)
-            {
-                gm.AdicionarMoeda(1);
-            }
+            GameManager.instance.AdicionarMoeda(1);
             Destroy(outro.gameObject);
+        }
+        else if (outro.gameObject.CompareTag("Obstaculo"))
+        {
+            GameManager.instance.GameOver();
         }
     }
 }

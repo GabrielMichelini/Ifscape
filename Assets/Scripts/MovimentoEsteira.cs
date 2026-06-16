@@ -11,14 +11,14 @@ public class MovimentoEsteira : MonoBehaviour
 
     void Update()
     {
-        if (player != null && player.enabled)
+        // O mundo só corre se o GameManager autorizar
+        if (player != null && GameManager.instance.jogoRodando)
         {
             transform.Translate(Vector3.back * player.forwardSpeed * Time.deltaTime, Space.World);
         }
 
-        // Aumentamos o limite para -200! 
-        // Assim ele limpa moedas velhas, mas nunca entra em conflito com o apagador de ruas.
-        if (transform.position.z < -200f)
+        // Faxina automática para moedas soltas
+        if (transform.position.z < -200f && !gameObject.CompareTag("Untagged"))
         {
             Destroy(gameObject);
         }

@@ -1,127 +1,151 @@
+using System.Collections;
 using UnityEngine;
 using TMPro; 
 using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
-    public GameObject telaGameOver;
-    public PlayerController playerScript;
+    public static GameManager instance;
 
-    // --- Sistema de Pontuação e Dificuldade ---
+    [Header("UI do Jogo")]
+    public GameObject telaGameOver;
     public TextMeshProUGUI textoPlacar;
-    private float pontuacao;
+    public TextMeshProUGUI textoMoedas;
+    public TextMeshProUGUI textoCountdown;
+
+    [Header("Leaderboard")]
+    public GameObject painelNovoRecorde; 
+    public TMP_InputField campoDigitacaoNome; 
+    public TextMeshProUGUI textoExibicaoRecorde; 
+
+    [Header("Configurações")]
+    public PlayerController playerScript;
+    public bool jogoRodando = false;
     public float dificuldade = 1f; 
 
-    // --- Sistema de Moedas ---
-    [Header("Sistema de Moedas")]
-    public TextMeshProUGUI textoMoedas;
+    [Header("Ajuste de Dificuldade")]
+    public float velocidadeMaximaDaEsteira = 35f; // Limite para o jogo não ficar impossível
+    public float aceleracaoPorSegundo = 0.2f; // O quanto a esteira acelera a cada segundo
+
+    private float pontuacao;
     private int moedasColetadas = 0;
+    private bool jogoIniciou = false;
 
-    // --- SISTEMA DE RECORDE (NOVO) ---
-    [Header("Leaderboard")]
-    public GameObject painelNovoRecorde; // A tela que pede o nome
-    public TMP_InputField campoDigitacaoNome; // Onde o jogador digita
-    public TextMeshProUGUI textoExibicaoRecorde; // Mostra "Recorde: Nome - Pontos" na tela do jogo
-
-    private bool jogoRodando = true;
+    void Awake() 
+    { 
+        if (instance == null) instance = this;
+        else Destroy(gameObject);
+    }
 
     void Start()
     {
         telaGameOver.SetActive(false);
-        if (painelNovoRecorde != null) painelNovoRecorde.SetActive(false); // Esconde a tela de recorde
+        if (painelNovoRecorde != null) painelNovoRecorde.SetActive(false);
         
-        Time.timeScale = 1f; 
+        Time.timeScale = 1f;
+        dificuldade = 1f; 
         pontuacao = 0;
-        moedasColetadas = 0; 
+        moedasColetadas = 0;
         
-        AtualizarTextoDoRecorde(); // Mostra o recorde salvo logo que o jogo começa
+        AtualizarTextoDoRecorde();
+
+        if (textoCountdown != null)
+        {
+            textoCountdown.gameObject.SetActive(true);
+            textoCountdown.text = "PRESSIONE QUALQUER TECLA";
+        }
     }
 
     void Update()
     {
+        // 1. Espera o jogador apertar um botão para iniciar a contagem
+        if (!jogoIniciou && Input.anyKeyDown)
+        {
+            jogoIniciou = true;
+            StartCoroutine(ContagemRegressiva());
+        }
+
+        // 2. O jogo rolando normalmente
         if (jogoRodando)
         {
+            // Soma a pontuação baseada na velocidade atual
             pontuacao += playerScript.forwardSpeed * Time.deltaTime;
-            
-            if (textoPlacar != null)
-                textoPlacar.text = Mathf.FloorToInt(pontuacao).ToString();
+            if (textoPlacar != null) textoPlacar.text = Mathf.FloorToInt(pontuacao).ToString();
 
+            // Cresce o multiplicador de dificuldade interno
             dificuldade += 0.02f * Time.deltaTime;
+
+            // ACELERANDO A ESTEIRA DO JOGO AOS POUCOS
+            if (playerScript != null && playerScript.forwardSpeed < velocidadeMaximaDaEsteira)
+            {
+                playerScript.forwardSpeed += aceleracaoPorSegundo * Time.deltaTime;
+            }
         }
+    }
+
+    private IEnumerator ContagemRegressiva()
+    {
+        int tempo = 3;
+        while (tempo > 0)
+        {
+            if (textoCountdown != null) textoCountdown.text = tempo.ToString();
+            yield return new WaitForSeconds(1f);
+            tempo--;
+        }
+        if (textoCountdown != null) textoCountdown.text = "VAI!";
+        yield return new WaitForSeconds(0.5f);
+        if (textoCountdown != null) textoCountdown.gameObject.SetActive(false);
+        
+        jogoRodando = true;
     }
 
     public void GameOver()
     {
-        if (!jogoRodando) return; 
-
+        if (!jogoRodando) return;
+        
         jogoRodando = false;
-        playerScript.forwardSpeed = 0;
-        playerScript.enabled = false;
+        Time.timeScale = 0f; 
 
-        Animator anim = playerScript.GetComponentInChildren<Animator>();
-        if (anim != null) anim.SetTrigger("Die");
-
-        // --- Lógica do Recorde ---
-        // Puxa o recorde salvo (se não tiver nada salvo, é 0)
         float recordeAtual = PlayerPrefs.GetFloat("MaiorPontuacao", 0f);
-
-        // Se a pontuação de agora for maior que o recorde antigo...
-        if (pontuacao > recordeAtual)
-        {
-            Invoke("MostrarTelaNovoRecorde", 2f); // Pede o nome!
-        }
-        else
-        {
-            Invoke("MostrarTela", 2f); // Game Over normal
-        }
+        if (pontuacao > recordeAtual) painelNovoRecorde.SetActive(true);
+        else telaGameOver.SetActive(true);
     }
 
-    void MostrarTela()
-    {
-        telaGameOver.SetActive(true);
-    }
-
-    void MostrarTelaNovoRecorde()
-    {
-        painelNovoRecorde.SetActive(true);
-    }
-
-    // --- FUNÇÃO PARA O BOTÃO "SALVAR" ---
     public void SalvarRecorde()
     {
-        // Pega o que o jogador digitou
         string nome = campoDigitacaoNome.text;
-        if (string.IsNullOrEmpty(nome)) nome = "Aluno Anônimo"; // Se não digitar nada
-
-        // Salva as informações no "bloquinho de notas" do Unity
+        if (string.IsNullOrEmpty(nome)) nome = "Aluno";
+        
         PlayerPrefs.SetFloat("MaiorPontuacao", pontuacao);
         PlayerPrefs.SetString("NomeRecordista", nome);
         PlayerPrefs.Save();
-
-        // Atualiza a tela, esconde o painel de digitar e mostra o Game Over
-        AtualizarTextoDoRecorde();
+        
         painelNovoRecorde.SetActive(false);
-        MostrarTela();
+        telaGameOver.SetActive(true);
     }
+
+    void Ny() {} // Evita qualquer conflito
+
+    void Ut() {} // Evita qualquer conflito
 
     void AtualizarTextoDoRecorde()
     {
         if (textoExibicaoRecorde != null)
         {
             float recorde = PlayerPrefs.GetFloat("MaiorPontuacao", 0f);
-            string nome = PlayerPrefs.GetString("NomeRecordista", "Ninguém");
+            string nome = PlayerPrefs.GetString("NomeRecordista", "---");
             textoExibicaoRecorde.text = $"Recorde: {nome} - {Mathf.FloorToInt(recorde)}";
         }
     }
 
-    public void ReiniciarJogo()
+    public void AdicionarMoeda(int v) 
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        moedasColetadas += v;
+        if (textoMoedas != null) textoMoedas.text = "Moedas: " + moedasColetadas;
     }
 
-    public void AdicionarMoeda(int valor)
-    {
-        moedasColetadas += valor;
-        if (textoMoedas != null) textoMoedas.text = "Moedas: " + moedasColetadas.ToString();
+    public void ReiniciarJogo() 
+    { 
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name); 
     }
 }

@@ -3,54 +3,58 @@ using UnityEngine;
 
 public class TileManager : MonoBehaviour
 {
-    public GameObject[] modelosDeRua; // Arraste seus Prefabs de rua aqui
+    public GameObject[] modelosDeRua; 
     
-    // O tamanho exato do seu modelo 3D da rua. Ajuste esse número se as ruas ficarem com buracos ou sobrepostas!
+    [Header("Configurações de Encaixe")]
     public float tamanhoDaRua = 30f; 
-    public int quantidadeNaTela = 5; // Quantas ruas ficam prontas rodando ao mesmo tempo
+    public int quantidadeNaTela = 6; 
 
     private List<GameObject> ruasAtivas = new List<GameObject>();
 
     void Start()
     {
-        // Cria as primeiras ruas para preencher a tela logo que o jogo começa
         for (int i = 0; i < quantidadeNaTela; i++)
         {
-            // A primeira nasce no 0, a segunda no 30, a terceira no 60...
-            SpawnRua(i * tamanhoDaRua);
+            if (modelosDeRua.Length == 0) return;
+
+            int index = Random.Range(0, modelosDeRua.Length);
+            GameObject novaRua = Instantiate(modelosDeRua[index], new Vector3(0, 0, i * tamanhoDaRua), Quaternion.identity);
+            
+            // Pega o gerador da rua
+            GeradorObstaculos gerador = novaRua.GetComponent<GeradorObstaculos>();
+            
+            // As 2 primeiras ruas do jogo começam limpas (pro jogador respirar), as outras já começam com jogo acontecendo!
+            if (i < 2)
+            {
+                if (gerador != null) gerador.LimparObstaculos();
+            }
+            else
+            {
+                if (gerador != null) gerador.GerarNovoObstaculo();
+            }
+
+            ruasAtivas.Add(novaRua);
         }
     }
 
     void Update()
     {
-        // Verifica se a lista de ruas não está vazia e se a primeira rua ainda existe
-        if (ruasAtivas.Count > 0 && ruasAtivas[0] != null)
+        if (ruasAtivas.Count == 0) return;
+
+        // Recicla o chão quando ele sai totalmente da visão da câmera
+        if (ruasAtivas[0].transform.position.z < -50f)
         {
-            // Se a primeira rua da fila foi muito para trás do AJ (passou da câmera)
-            if (ruasAtivas[0].transform.position.z < -tamanhoDaRua)
-            {
-                // Pega a posição exata de onde a ÚLTIMA rua da esteira está agora
-                float posicaoZDaUltimaRua = ruasAtivas[ruasAtivas.Count - 1].transform.position.z;
-                
-                // Cria uma rua nova exatamente colada no final dessa última
-                SpawnRua(posicaoZDaUltimaRua + tamanhoDaRua);
+            GameObject ruaParaMover = ruasAtivas[0];
+            ruasAtivas.RemoveAt(0);
 
-                // Destrói a rua velha que ficou para trás e remove da lista
-                Destroy(ruasAtivas[0]);
-                ruasAtivas.RemoveAt(0);
-            }
+            float novaPosicaoZ = ruasAtivas[ruasAtivas.Count - 1].transform.position.z + tamanhoDaRua;
+            ruaParaMover.transform.position = new Vector3(0, 0, novaPosicaoZ);
+
+            // Sorteia tudo de novo (Armários e Moedas) lá na frente!
+            GeradorObstaculos gerador = ruaParaMover.GetComponent<GeradorObstaculos>();
+            if (gerador != null) gerador.GerarNovoObstaculo();
+
+            ruasAtivas.Add(ruaParaMover);
         }
-    }
-
-    void SpawnRua(float posicaoZ)
-    {
-        // Escolhe uma rua aleatória dos seus prefabs
-        int index = Random.Range(0, modelosDeRua.Length);
-        
-        // Cria a rua no mundo
-        GameObject novaRua = Instantiate(modelosDeRua[index], new Vector3(0, 0, posicaoZ), Quaternion.identity);
-        
-        // Adiciona ela na nossa lista de controle
-        ruasAtivas.Add(novaRua);
     }
 }
