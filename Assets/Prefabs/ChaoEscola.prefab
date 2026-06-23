@@ -248,7 +248,13 @@ MonoBehaviour:
     type: 3}
   prefabMoeda: {fileID: 5998957075273373501, guid: 10bce50abfce90e429fbf00b896fdb71,
     type: 3}
+  prefabPowerUp: {fileID: 5844881792908368109, guid: 19b7d54fabdf1cf4f8c3b9079344c04e,
+    type: 3}
   rotacaoYArmario: 90
+  rotacaoPowerUp: {x: 0, y: 90, z: 0}
+  moedasPorSequencia: 4
+  espacamentoEntreMoedas: 2
+  chancePowerUp: 1
 --- !u!114 &1245851365506445556
 MonoBehaviour:
   m_ObjectHideFlags: 0

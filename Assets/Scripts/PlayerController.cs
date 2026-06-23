@@ -24,6 +24,12 @@ public class PlayerController : MonoBehaviour
     [Header("Sensor de Dano")]
     public float distanciaDeteccao = 0.6f;
 
+    // --- NOVO: CONFIGURAÇÕES DO POWER UP ---
+    [Header("Power Up (Invencibilidade)")]
+    public float duracaoDoPoder = 5f; // Quanto tempo dura o brilho
+    public GameObject efeitoBrilho; // O objeto de luz/escudo que vamos criar no Unity
+    private bool isInvencivel = false; // Diz se o AJ está indestrutível no momento
+
     private int desiredLane = 1; 
     private float verticalVelocity;
 
@@ -34,19 +40,31 @@ public class PlayerController : MonoBehaviour
 
         originalHeight = controller.height;
         originalCenter = controller.center;
+
+        // Garante que o brilho comece desligado
+        if (efeitoBrilho != null) efeitoBrilho.SetActive(false);
     }
 
     void Update()
     {
         if (!GameManager.instance.jogoRodando) return;
 
-        // --- SENSOR A LASER CONTRA ARMÁRIOS ---
+        // --- SENSOR A LASER CONTRA ARMÁRIOS (ATUALIZADO) ---
         RaycastHit hit;
         if (Physics.Raycast(transform.position + Vector3.up * 0.5f, Vector3.forward, out hit, distanciaDeteccao))
         {
             if (hit.collider.CompareTag("Obstaculo") || hit.collider.transform.root.CompareTag("Obstaculo"))
             {
-                GameManager.instance.GameOver();
+                if (isInvencivel)
+                {
+                    // Se estiver brilhando, destrói o obstáculo na porrada!
+                    Destroy(hit.collider.gameObject);
+                }
+                else
+                {
+                    // Se estiver normal, morre.
+                    GameManager.instance.GameOver();
+                }
             }
         }
 
@@ -92,7 +110,7 @@ public class PlayerController : MonoBehaviour
         // --- APLICA O MOVIMENTO ---
         moveVector.x = xMovement;
         moveVector.y = verticalVelocity;
-        moveVector.z = 0f; // AJ não corre fisicamente para frente
+        moveVector.z = 0f; 
 
         controller.Move(moveVector * Time.deltaTime);
     }
@@ -112,7 +130,20 @@ public class PlayerController : MonoBehaviour
         isRolling = false;
     }
 
-    // --- SENSOR PARA MOEDAS ---
+    // --- NOVO: ROTINA DO PODER ---
+    private IEnumerator AtivarInvencibilidade()
+    {
+        isInvencivel = true;
+        if (efeitoBrilho != null) efeitoBrilho.SetActive(true); // Liga o visual
+
+        // Espera os segundos definidos passarem
+        yield return new WaitForSeconds(duracaoDoPoder);
+
+        isInvencivel = false;
+        if (efeitoBrilho != null) efeitoBrilho.SetActive(false); // Desliga o visual
+    }
+
+    // --- SENSOR PARA MOEDAS E ITENS ---
     void OnTriggerEnter(Collider outro)
     {
         if (outro.gameObject.CompareTag("Moeda"))
@@ -120,9 +151,16 @@ public class PlayerController : MonoBehaviour
             GameManager.instance.AdicionarMoeda(1);
             Destroy(outro.gameObject);
         }
+        else if (outro.gameObject.CompareTag("PowerUp")) // NOVO: Pegou a estrela/escudo!
+        {
+            StartCoroutine(AtivarInvencibilidade());
+            Destroy(outro.gameObject); // Apaga o item da rua
+        }
         else if (outro.gameObject.CompareTag("Obstaculo"))
         {
-            GameManager.instance.GameOver();
+            // Segurança extra para caso o raycast falhe
+            if (isInvencivel) Destroy(outro.gameObject);
+            else GameManager.instance.GameOver();
         }
     }
 }
