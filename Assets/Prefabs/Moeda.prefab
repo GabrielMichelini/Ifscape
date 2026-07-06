@@ -93,8 +93,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6344238174017686919}
   - component: {fileID: 7271051943781031587}
-  - component: {fileID: 6043651281208899454}
-  - component: {fileID: -5913735125587607030}
+  - component: {fileID: -8623485883879161331}
   m_Layer: 0
   m_Name: Moeda
   m_TagString: Moeda
@@ -131,7 +130,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 2.608777, z: 1.2904339}
   m_Center: {x: 0, y: 0.80438805, z: -0.14521681}
---- !u!114 &6043651281208899454
+--- !u!114 &-8623485883879161331
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -140,19 +139,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 5998957075273373501}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b2b41445a9cf2a546ac3f7148b7d6a63, type: 3}
+  m_Script: {fileID: 11500000, guid: a0e6df5f6bbf6b549828f8963273d28c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  velocidadeGiro: 150
---- !u!114 &-5913735125587607030
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5998957075273373501}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 11059083aee9b5f4f889fa1fba636f53, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  valor: 1
+  velocidadeGiro: 120
+  somColeta: {fileID: 8300000, guid: 8ffc2c60b8f34ae44951bada318a3ff7, type: 3}

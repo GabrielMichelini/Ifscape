@@ -5,8 +5,13 @@ public class GeradorObstaculos : MonoBehaviour
 {
     [Header("Prefabs dos Objetos")]
     public GameObject prefabArmario; 
+    public GameObject prefabBarreiraBaixa; 
     public GameObject prefabMoeda; 
     public GameObject prefabPowerUp; 
+
+    [Header("Frequência e Dificuldade")]
+    [Range(0f, 1f)]
+    public float chanceBaseObstaculo = 0.75f; 
 
     [Header("Ajustes de Rotação Inicial")]
     public float rotacaoYArmario = 0f; 
@@ -29,10 +34,7 @@ public class GeradorObstaculos : MonoBehaviour
         pontosDeSpawn.Clear();
         foreach (Transform filho in transform)
         {
-            if (filho.name.StartsWith("Ponto"))
-            {
-                pontosDeSpawn.Add(filho);
-            }
+            if (filho.name.StartsWith("Ponto")) pontosDeSpawn.Add(filho);
         }
     }
 
@@ -43,42 +45,59 @@ public class GeradorObstaculos : MonoBehaviour
         if (pontosDeSpawn.Count == 0) ConfigurarPontos();
         if (pontosDeSpawn.Count == 0) return;
 
-        // 1. Sorteia o local do Armário
-        int pistaDoArmario = Random.Range(0, pontosDeSpawn.Count);
-        float chanceDoArmario = 0.4f + (GameManager.instance.dificuldade * 0.05f);
-
-        if (Random.value < chanceDoArmario)
+        // 1. Escolhe a primeira pista bloqueada
+        List<int> pistasBloqueadas = new List<int>();
+        int pista1 = Random.Range(0, pontosDeSpawn.Count);
+        pistasBloqueadas.Add(pista1);
+        
+        // --- NOVO: A DIFICULDADE CRUEL ---
+        // Se a dificuldade passar de 1.5, tem 35% de chance de fechar DUAS pistas!
+        if (GameManager.instance.dificuldade > 1.5f && Random.value < 0.35f)
         {
-            if (pontosDeSpawn[pistaDoArmario] != null)
+            int pista2 = Random.Range(0, pontosDeSpawn.Count);
+            while (pista2 == pista1) // Garante que a pista 2 seja diferente da pista 1
             {
-                GameObject armario = Instantiate(prefabArmario, pontosDeSpawn[pistaDoArmario].position, Quaternion.Euler(0, rotacaoYArmario, 0));
-                armario.transform.SetParent(this.transform);
-                objetosInstanciados.Add(armario);
+                pista2 = Random.Range(0, pontosDeSpawn.Count);
+            }
+            pistasBloqueadas.Add(pista2);
+        }
+
+        float chanceDoObstaculo = chanceBaseObstaculo + (GameManager.instance.dificuldade * 0.05f);
+
+        // 2. GERA OS OBSTÁCULOS
+        if (Random.value < chanceDoObstaculo)
+        {
+            foreach (int p in pistasBloqueadas)
+            {
+                if (pontosDeSpawn[p] != null)
+                {
+                    GameObject obstaculoSorteado = prefabArmario;
+                    if (prefabBarreiraBaixa != null && Random.value > 0.5f) obstaculoSorteado = prefabBarreiraBaixa;
+
+                    GameObject obstaculo = Instantiate(obstaculoSorteado, pontosDeSpawn[p].position, Quaternion.Euler(0, rotacaoYArmario, 0));
+                    obstaculo.transform.SetParent(this.transform);
+                    objetosInstanciados.Add(obstaculo);
+                }
             }
         }
 
-        bool jaSpawnouPoderAqui = false; // Trava para não nascer 2 Power Ups lado a lado
+        bool jaSpawnouPoderAqui = false; 
 
-        // 2. SISTEMA DE ITENS CORRIGIDO E ISOLADO
+        // 3. GERA OS ITENS NAS PISTAS LIVRES
         for (int i = 0; i < pontosDeSpawn.Count; i++)
         {
-            if (i != pistaDoArmario && pontosDeSpawn[i] != null)
+            // Verifica se a pista atual NÃO está na lista de bloqueadas
+            if (!pistasBloqueadas.Contains(i) && pontosDeSpawn[i] != null)
             {
-                // PRIORIDADE MÁXIMA: É a hora do Power Up? Ele nasce garantido!
                 if (prefabPowerUp != null && GameManager.instance.deveSpawnarPowerUp && !jaSpawnouPoderAqui) 
                 {
                     GameObject powerUp = Instantiate(prefabPowerUp, pontosDeSpawn[i].position, Quaternion.Euler(rotacaoPowerUp));
                     powerUp.transform.SetParent(this.transform);
                     objetosInstanciados.Add(powerUp);
                     
-                    // Avisa o GameManager que o item já nasceu e trava para as outras pistas do mesmo chão
                     GameManager.instance.deveSpawnarPowerUp = false; 
                     jaSpawnouPoderAqui = true;
-
-                    // ALARME NO CONSOLE PARA VOCÊ ACHAR O ITEM SE ELE ESTIVER INVISÍVEL
-                    Debug.Log("🚨 O POWER UP NASCEU FISICAMENTE NA PISTA " + i);
                 }
-                // SE NÃO FOR A HORA DO POWER UP: Roda o sorteio normal de 60% para as moedas
                 else if (Random.value < 0.6f) 
                 {
                     if (prefabMoeda != null) 

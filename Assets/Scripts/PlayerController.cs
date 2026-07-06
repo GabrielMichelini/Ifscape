@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -24,11 +25,9 @@ public class PlayerController : MonoBehaviour
     [Header("Sensor de Dano")]
     public float distanciaDeteccao = 0.6f;
 
-    // --- NOVO: CONFIGURAÇÕES DO POWER UP ---
     [Header("Power Up (Invencibilidade)")]
-    public float duracaoDoPoder = 5f; // Quanto tempo dura o brilho
-    public GameObject efeitoBrilho; // O objeto de luz/escudo que vamos criar no Unity
-    private bool isInvencivel = false; // Diz se o AJ está indestrutível no momento
+    public float duracaoDoPoder = 5f; 
+    private bool isInvencivel = false; 
 
     private int desiredLane = 1; 
     private float verticalVelocity;
@@ -40,31 +39,20 @@ public class PlayerController : MonoBehaviour
 
         originalHeight = controller.height;
         originalCenter = controller.center;
-
-        // Garante que o brilho comece desligado
-        if (efeitoBrilho != null) efeitoBrilho.SetActive(false);
     }
 
     void Update()
     {
         if (!GameManager.instance.jogoRodando) return;
 
-        // --- SENSOR A LASER CONTRA ARMÁRIOS (ATUALIZADO) ---
+        // --- SENSOR A LASER CONTRA ARMÁRIOS ---
         RaycastHit hit;
         if (Physics.Raycast(transform.position + Vector3.up * 0.5f, Vector3.forward, out hit, distanciaDeteccao))
         {
             if (hit.collider.CompareTag("Obstaculo") || hit.collider.transform.root.CompareTag("Obstaculo"))
             {
-                if (isInvencivel)
-                {
-                    // Se estiver brilhando, destrói o obstáculo na porrada!
-                    Destroy(hit.collider.gameObject);
-                }
-                else
-                {
-                    // Se estiver normal, morre.
-                    GameManager.instance.GameOver();
-                }
+                if (isInvencivel) Destroy(hit.collider.gameObject);
+                else GameManager.instance.GameOver();
             }
         }
 
@@ -130,35 +118,85 @@ public class PlayerController : MonoBehaviour
         isRolling = false;
     }
 
-    // --- NOVO: ROTINA DO PODER ---
-    private IEnumerator AtivarInvencibilidade()
+    // --- FUNÇÃO PÚBLICA PARA O POWER UP ACESSAR ---
+    public void AtivarPoder()
     {
-        isInvencivel = true;
-        if (efeitoBrilho != null) efeitoBrilho.SetActive(true); // Liga o visual
-
-        // Espera os segundos definidos passarem
-        yield return new WaitForSeconds(duracaoDoPoder);
-
-        isInvencivel = false;
-        if (efeitoBrilho != null) efeitoBrilho.SetActive(false); // Desliga o visual
+        StartCoroutine(RotinaInvencibilidade());
     }
 
-    // --- SENSOR PARA MOEDAS E ITENS ---
+    // --- NOVA ROTINA: O EFEITO DE BRILHO (ESTRELA) ---
+    private IEnumerator RotinaInvencibilidade()
+    {
+        isInvencivel = true;
+
+        // Pega todas as partes do modelo 3D
+        Renderer[] renderers = GetComponentsInChildren<Renderer>();
+        
+        // Dicionário para salvar as cores originais da roupa
+        Dictionary<Material, Color> coresOriginais = new Dictionary<Material, Color>();
+
+        // Salva as cores originais antes de começar a piscar
+        foreach (Renderer r in renderers)
+        {
+            if (r.gameObject == this.gameObject) continue; // Pula o cubo fantasma
+            
+            foreach (Material mat in r.materials)
+            {
+                if (mat.HasProperty("_Color") && !coresOriginais.ContainsKey(mat))
+                {
+                    coresOriginais.Add(mat, mat.color);
+                }
+            }
+        }
+
+        float tempoPassado = 0f;
+        float velocidadePiscar = 0.15f; 
+        bool corAlternada = false;
+
+        // Fica trocando de cor enquanto o tempo do poder não acabar
+        while (tempoPassado < duracaoDoPoder)
+        {
+            foreach (Renderer r in renderers) 
+            {
+                if (r.gameObject == this.gameObject) continue;
+                
+                foreach (Material mat in r.materials)
+                {
+                    if (mat.HasProperty("_Color"))
+                    {
+                        // Se for a vez de alternar, pinta de Amarelo. Se não, volta pra cor original.
+                        mat.color = corAlternada ? Color.yellow : coresOriginais[mat]; 
+                    }
+                }
+            }
+            
+            corAlternada = !corAlternada; // Inverte para a próxima piscada
+            yield return new WaitForSeconds(velocidadePiscar);
+            tempoPassado += velocidadePiscar;
+        }
+
+        // Quando o poder acaba, garante que todas as cores voltem ao normal!
+        foreach (Renderer r in renderers) 
+        {
+            if (r.gameObject == this.gameObject) continue;
+            
+            foreach (Material mat in r.materials)
+            {
+                if (mat.HasProperty("_Color") && coresOriginais.ContainsKey(mat))
+                {
+                    mat.color = coresOriginais[mat];
+                }
+            }
+        }
+        
+        isInvencivel = false;
+    }
+
+    // --- SENSOR PARA BATER NOS OBSTÁCULOS ---
     void OnTriggerEnter(Collider outro)
     {
-        if (outro.gameObject.CompareTag("Moeda"))
+        if (outro.gameObject.CompareTag("Obstaculo"))
         {
-            GameManager.instance.AdicionarMoeda(1);
-            Destroy(outro.gameObject);
-        }
-        else if (outro.gameObject.CompareTag("PowerUp")) // NOVO: Pegou a estrela/escudo!
-        {
-            StartCoroutine(AtivarInvencibilidade());
-            Destroy(outro.gameObject); // Apaga o item da rua
-        }
-        else if (outro.gameObject.CompareTag("Obstaculo"))
-        {
-            // Segurança extra para caso o raycast falhe
             if (isInvencivel) Destroy(outro.gameObject);
             else GameManager.instance.GameOver();
         }

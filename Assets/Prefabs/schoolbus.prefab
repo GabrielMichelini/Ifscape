@@ -513,7 +513,6 @@ GameObject:
   - component: {fileID: 8756389988172723364}
   - component: {fileID: 6387749774350648193}
   - component: {fileID: -3404420486604184774}
-  - component: {fileID: -2004005047000100306}
   m_Layer: 0
   m_Name: schoolbus
   m_TagString: Onibus
@@ -622,21 +621,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   velocidadeExtra: 40
-  raioDoRadar: 0.8
-  particulaBatida: {fileID: 9017973178397477612, guid: 9457f2a8b86a2664da35b8e5fea03615,
-    type: 3}
---- !u!114 &-2004005047000100306
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7098814568628868465}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 11059083aee9b5f4f889fa1fba636f53, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  raioDoRadar: 0.6
+  particulaBatida: {fileID: 0}
+  somBuzina: {fileID: 8300000, guid: 00e4ce0b4002f6040b8ade03f57e53df, type: 3}
 --- !u!1 &8193950507501390671
 GameObject:
   m_ObjectHideFlags: 0

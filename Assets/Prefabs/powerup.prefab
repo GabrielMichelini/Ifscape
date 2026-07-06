@@ -11,9 +11,10 @@ GameObject:
   - component: {fileID: 6509638429368894039}
   - component: {fileID: 7924429049526275570}
   - component: {fileID: 5340650639198009656}
-  - component: {fileID: -5896056530671010120}
+  - component: {fileID: 2539733505231154476}
+  - component: {fileID: -5149178585994169802}
   m_Layer: 0
-  m_Name: tripo_convert_6a916816-77d9-44ac-a28d-c5fa9c0a7ee7
+  m_Name: powerup
   m_TagString: PowerUp
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -28,7 +29,7 @@ Transform:
   m_GameObject: {fileID: 5844881792908368109}
   m_LocalRotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071068}
   m_LocalPosition: {x: -0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2.5, y: 2.5, z: 2.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -84,7 +85,7 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &-5896056530671010120
+--- !u!114 &2539733505231154476
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -93,7 +94,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 5844881792908368109}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b2b41445a9cf2a546ac3f7148b7d6a63, type: 3}
+  m_Script: {fileID: 11500000, guid: de87262284c6dce45a98f06357dac109, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  velocidadeGiro: 150
+  velocidadeGiro: 100
+  somPoder: {fileID: 0}
+--- !u!65 &-5149178585994169802
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5844881792908368109}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.31652832, y: 0.31869516, z: 1.0000002}
+  m_Center: {x: 0, y: 0, z: 0}

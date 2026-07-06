@@ -4,16 +4,24 @@ public class OnibusInimigo : MonoBehaviour
 {
     public float velocidadeExtra = 15f; 
     public float raioDoRadar = 3f; 
-    
-    // --- NOVO: Espaço para a sua partícula ---
     public GameObject particulaBatida; 
+
+    [Header("Áudio")]
+    public AudioClip somBuzina; // NOVO: Caixinha para o som do ônibus!
 
     private PlayerController player;
 
     void Start()
     {
         player = FindObjectOfType<PlayerController>();
-        Destroy(gameObject, 10f); // Destrói o ônibus depois de 10 segundos para não pesar o jogo
+
+        // Toca a buzina assim que ele nasce na rua!
+        if (somBuzina != null)
+        {
+            AudioSource.PlayClipAtPoint(somBuzina, Camera.main.transform.position, 1f);
+        }
+
+        Destroy(gameObject, 10f); 
     }
 
     void Update()
@@ -23,13 +31,9 @@ public class OnibusInimigo : MonoBehaviour
             float velocidadeTotal = player.forwardSpeed + velocidadeExtra;
             transform.Translate(Vector3.forward * velocidadeTotal * Time.deltaTime, Space.World);
             
-            // --- A GRANDE CORREÇÃO ESTÁ AQUI ---
-            // Separamos a matemática para ele entender o que é "Pista" e o que é "Frente/Trás"
             float distanciaZ = Mathf.Abs(transform.position.z - player.transform.position.z);
             float distanciaX = Mathf.Abs(transform.position.x - player.transform.position.x);
 
-            // Só dá Game Over se o ônibus estiver muito perto no eixo Z (batida) 
-            // E EXATAMENTE na mesma pista (distância X menor que 1 metro)
             if (distanciaZ < 2.5f && distanciaX < 1.0f)
             {
                 FindObjectOfType<GameManager>().GameOver();
@@ -39,18 +43,13 @@ public class OnibusInimigo : MonoBehaviour
         Collider[] objetosNoRadar = Physics.OverlapSphere(transform.position, raioDoRadar);
         foreach (Collider obj in objetosNoRadar)
         {
-            AlvoDoOnibus alvo = obj.GetComponentInParent<AlvoDoOnibus>();
-            
-            if (alvo != null)
+            if (obj.CompareTag("Obstaculo"))
             {
-                // --- NOVO: Cria a explosão EXATAMENTE na posição do armário ---
                 if (particulaBatida != null)
                 {
-                    Instantiate(particulaBatida, alvo.transform.position, Quaternion.identity);
+                    Instantiate(particulaBatida, obj.transform.position, Quaternion.identity);
                 }
-
-                // E depois destrói o armário
-                Destroy(alvo.gameObject);
+                Destroy(obj.gameObject); 
             }
         }
     }
