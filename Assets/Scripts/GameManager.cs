@@ -24,8 +24,15 @@ public class GameManager : MonoBehaviour
     public float dificuldade = 1f; 
 
     [Header("Ajuste de Dificuldade")]
-    public float velocidadeMaximaDaEsteira = 35f; // Limite para o jogo não ficar impossível
-    public float aceleracaoPorSegundo = 0.2f; // O quanto a esteira acelera a cada segundo
+    public float velocidadeMaximaDaEsteira = 35f; 
+    public float aceleracaoPorSegundo = 0.2f; 
+
+    [Header("Frequência do Power Up")]
+    [Tooltip("De quantos em quantos pontos o escudo vai aparecer? (Ex: 75, 100, 150)")]
+    public float pontosParaPowerUp = 100f; 
+
+    [HideInInspector] public bool deveSpawnarPowerUp = false;
+    private float proximoMarcoPowerUp;
 
     private float pontuacao;
     private int moedasColetadas = 0;
@@ -46,6 +53,9 @@ public class GameManager : MonoBehaviour
         dificuldade = 1f; 
         pontuacao = 0;
         moedasColetadas = 0;
+
+        deveSpawnarPowerUp = false;
+        proximoMarcoPowerUp = pontosParaPowerUp; 
         
         AtualizarTextoDoRecorde();
 
@@ -58,27 +68,29 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        // 1. Espera o jogador apertar um botão para iniciar a contagem
         if (!jogoIniciou && Input.anyKeyDown)
         {
             jogoIniciou = true;
             StartCoroutine(ContagemRegressiva());
         }
 
-        // 2. O jogo rolando normalmente
         if (jogoRodando)
         {
-            // Soma a pontuação baseada na velocidade atual
             pontuacao += playerScript.forwardSpeed * Time.deltaTime;
             if (textoPlacar != null) textoPlacar.text = Mathf.FloorToInt(pontuacao).ToString();
 
-            // Cresce o multiplicador de dificuldade interno
             dificuldade += 0.02f * Time.deltaTime;
 
-            // ACELERANDO A ESTEIRA DO JOGO AOS POUCOS
             if (playerScript != null && playerScript.forwardSpeed < velocidadeMaximaDaEsteira)
             {
                 playerScript.forwardSpeed += aceleracaoPorSegundo * Time.deltaTime;
+            }
+
+            // Verifica se bateu o marco de pontos
+            if (pontuacao >= proximoMarcoPowerUp)
+            {
+                deveSpawnarPowerUp = true;
+                proximoMarcoPowerUp += pontosParaPowerUp; 
             }
         }
     }
@@ -123,10 +135,6 @@ public class GameManager : MonoBehaviour
         painelNovoRecorde.SetActive(false);
         telaGameOver.SetActive(true);
     }
-
-    void Ny() {} // Evita qualquer conflito
-
-    void Ut() {} // Evita qualquer conflito
 
     void AtualizarTextoDoRecorde()
     {

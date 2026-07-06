@@ -17,7 +17,7 @@ RenderSettings:
   m_Fog: 1
   m_FogColor: {r: 0.34117648, g: 0.47450984, b: 0.7176471, a: 1}
   m_FogMode: 3
-  m_FogDensity: 0.1
+  m_FogDensity: 0.06
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
   m_AmbientSkyColor: {r: 0.212, g: 0.227, b: 0.259, a: 1}
@@ -325,6 +325,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 83c288f46dd21e242b37271be6519392,
         type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 83c288f46dd21e242b37271be6519392,
+        type: 3}
       propertyPath: m_TagString
       value: PowerUp
       objectReference: {fileID: 0}
@@ -390,6 +395,8 @@ MonoBehaviour:
   dificuldade: 10
   velocidadeMaximaDaEsteira: 35
   aceleracaoPorSegundo: 0.2
+  pontosParaPowerUp: 100
+  deveSpawnarPowerUp: 0
 --- !u!4 &153041474
 Transform:
   m_ObjectHideFlags: 0

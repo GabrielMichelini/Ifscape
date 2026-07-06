@@ -9,14 +9,12 @@ public class GeradorObstaculos : MonoBehaviour
     public GameObject prefabPowerUp; 
 
     [Header("Ajustes de Rotação Inicial")]
-    [Tooltip("Se o armário nascer virado errado, mude aqui (ex: 0, 90, 180, 270)")]
     public float rotacaoYArmario = 0f; 
-    [Tooltip("Se o Power Up nascer virado errado, mude aqui")]
-    public float rotacaoYPowerUp = 0f; 
+    public Vector3 rotacaoPowerUp = new Vector3(0, 0, 0); 
 
-    [Header("Configuração da Sequência de Moedas")]
-    public int moedasPorSequencia = 4; // Quantas moedas nascem em fila
-    public float espacamentoEntreMoedas = 2f; // Distância (Z) entre uma moeda e outra na fileira
+    [Header("Configuração de Spawn de Moedas")]
+    public int moedasPorSequencia = 4; 
+    public float espacamentoEntreMoedas = 2f; 
 
     private List<Transform> pontosDeSpawn = new List<Transform>(); 
     private List<GameObject> objetosInstanciados = new List<GameObject>(); 
@@ -45,7 +43,7 @@ public class GeradorObstaculos : MonoBehaviour
         if (pontosDeSpawn.Count == 0) ConfigurarPontos();
         if (pontosDeSpawn.Count == 0) return;
 
-        // 1. Sorteia uma pista para o Obstáculo (Armário)
+        // 1. Sorteia o local do Armário
         int pistaDoArmario = Random.Range(0, pontosDeSpawn.Count);
         float chanceDoArmario = 0.4f + (GameManager.instance.dificuldade * 0.05f);
 
@@ -53,34 +51,41 @@ public class GeradorObstaculos : MonoBehaviour
         {
             if (pontosDeSpawn[pistaDoArmario] != null)
             {
-                // Cria o armário usando o ângulo corrigido
                 GameObject armario = Instantiate(prefabArmario, pontosDeSpawn[pistaDoArmario].position, Quaternion.Euler(0, rotacaoYArmario, 0));
                 armario.transform.SetParent(this.transform);
                 objetosInstanciados.Add(armario);
             }
         }
 
-        // 2. SISTEMA DE ITENS: Nas pistas livres, gera Sequências de Moedas ou o Power Up
+        bool jaSpawnouPoderAqui = false; // Trava para não nascer 2 Power Ups lado a lado
+
+        // 2. SISTEMA DE ITENS CORRIGIDO E ISOLADO
         for (int i = 0; i < pontosDeSpawn.Count; i++)
         {
             if (i != pistaDoArmario && pontosDeSpawn[i] != null)
             {
-                if (Random.value < 0.6f) // 60% de chance de popular a pista livre
+                // PRIORIDADE MÁXIMA: É a hora do Power Up? Ele nasce garantido!
+                if (prefabPowerUp != null && GameManager.instance.deveSpawnarPowerUp && !jaSpawnouPoderAqui) 
                 {
-                    // 8% de chance de nascer o Power Up em vez de moedas
-                    if (prefabPowerUp != null && Random.value < 0.08f) 
-                    {
-                        GameObject powerUp = Instantiate(prefabPowerUp, pontosDeSpawn[i].position, Quaternion.Euler(0, rotacaoYPowerUp, 0));
-                        powerUp.transform.SetParent(this.transform);
-                        objetosInstanciados.Add(powerUp);
-                    }
-                    else if (prefabMoeda != null) // Cria a trilha de moedas em linha reta (Z)
+                    GameObject powerUp = Instantiate(prefabPowerUp, pontosDeSpawn[i].position, Quaternion.Euler(rotacaoPowerUp));
+                    powerUp.transform.SetParent(this.transform);
+                    objetosInstanciados.Add(powerUp);
+                    
+                    // Avisa o GameManager que o item já nasceu e trava para as outras pistas do mesmo chão
+                    GameManager.instance.deveSpawnarPowerUp = false; 
+                    jaSpawnouPoderAqui = true;
+
+                    // ALARME NO CONSOLE PARA VOCÊ ACHAR O ITEM SE ELE ESTIVER INVISÍVEL
+                    Debug.Log("🚨 O POWER UP NASCEU FISICAMENTE NA PISTA " + i);
+                }
+                // SE NÃO FOR A HORA DO POWER UP: Roda o sorteio normal de 60% para as moedas
+                else if (Random.value < 0.6f) 
+                {
+                    if (prefabMoeda != null) 
                     {
                         for (int j = 0; j < moedasPorSequencia; j++)
                         {
-                            // Calcula a posição de cada moeda empurrando elas para frente no eixo Z
                             Vector3 posicaoMoeda = pontosDeSpawn[i].position + new Vector3(0, 0, j * espacamentoEntreMoedas);
-                            
                             GameObject moeda = Instantiate(prefabMoeda, posicaoMoeda, Quaternion.identity);
                             moeda.transform.SetParent(this.transform);
                             objetosInstanciados.Add(moeda);

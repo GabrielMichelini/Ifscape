@@ -13,7 +13,7 @@ public class OnibusInimigo : MonoBehaviour
     void Start()
     {
         player = FindObjectOfType<PlayerController>();
-        Destroy(gameObject, 10f);
+        Destroy(gameObject, 10f); // Destrói o ônibus depois de 10 segundos para não pesar o jogo
     }
 
     void Update()
@@ -23,8 +23,14 @@ public class OnibusInimigo : MonoBehaviour
             float velocidadeTotal = player.forwardSpeed + velocidadeExtra;
             transform.Translate(Vector3.forward * velocidadeTotal * Time.deltaTime, Space.World);
             
-            float distanciaProAJ = Vector3.Distance(transform.position, player.transform.position);
-            if (distanciaProAJ < 3f)
+            // --- A GRANDE CORREÇÃO ESTÁ AQUI ---
+            // Separamos a matemática para ele entender o que é "Pista" e o que é "Frente/Trás"
+            float distanciaZ = Mathf.Abs(transform.position.z - player.transform.position.z);
+            float distanciaX = Mathf.Abs(transform.position.x - player.transform.position.x);
+
+            // Só dá Game Over se o ônibus estiver muito perto no eixo Z (batida) 
+            // E EXATAMENTE na mesma pista (distância X menor que 1 metro)
+            if (distanciaZ < 2.5f && distanciaX < 1.0f)
             {
                 FindObjectOfType<GameManager>().GameOver();
             }

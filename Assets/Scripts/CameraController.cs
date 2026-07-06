@@ -22,4 +22,4 @@ public class CameraController : MonoBehaviour
             transform.position = targetPosition;
         }
     }
-}
+}   
