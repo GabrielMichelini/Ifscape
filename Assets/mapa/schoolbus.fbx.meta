@@ -3,7 +3,12 @@ guid: 094edc9df46461f46b39131b646cd382
 ModelImporter:
   serializedVersion: 21300
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: ImphenziaPalette01-256-Gradient
+    second: {fileID: 2800000, guid: 0cb9586fa72690b4ba33fab57c67b249, type: 3}
   materials:
     materialImportMode: 2
     materialName: 0

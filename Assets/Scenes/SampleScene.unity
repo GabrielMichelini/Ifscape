@@ -96,7 +96,8 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 0}
+  m_LightingDataAsset: {fileID: 112000000, guid: 58fee6af66608e0469d565d56ec21441,
+    type: 2}
   m_LightingSettings: {fileID: 0}
 --- !u!196 &4
 NavMeshSettings:
@@ -395,7 +396,7 @@ MonoBehaviour:
   dificuldade: 10
   velocidadeMaximaDaEsteira: 100
   aceleracaoPorSegundo: 0.6
-  pontosParaPowerUp: 100
+  pontosParaPowerUp: 300
   deveSpawnarPowerUp: 0
 --- !u!4 &153041474
 Transform:
@@ -870,7 +871,7 @@ MonoBehaviour:
   rollHeight: 0.3
   rollDuration: 0.8
   distanciaDeteccao: 0.6
-  duracaoDoPoder: 5
+  duracaoDoPoder: 4
 --- !u!143 &592104228
 CharacterController:
   m_ObjectHideFlags: 0
@@ -1381,7 +1382,7 @@ MonoBehaviour:
   modelosDeRua:
   - {fileID: 7244124678029382820, guid: f7740a223a1542742b35453cc5d53d89, type: 3}
   tamanhoDaRua: 25
-  quantidadeNaTela: 15
+  quantidadeNaTela: 7
 --- !u!4 &1046727143
 Transform:
   m_ObjectHideFlags: 0
@@ -2412,6 +2413,50 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &1800699230
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1800699232}
+  - component: {fileID: 1800699231}
+  m_Layer: 0
+  m_Name: MenuManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1800699231
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1800699230}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78574746829a9ed41a37b2a48d07d32e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &1800699232
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1800699230}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -12.558269, y: -1.8834265, z: 20.794641}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 8
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1829935981
 PrefabInstance:
   m_ObjectHideFlags: 0
