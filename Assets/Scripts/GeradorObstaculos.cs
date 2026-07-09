@@ -13,8 +13,10 @@ public class GeradorObstaculos : MonoBehaviour
     [Range(0f, 1f)]
     public float chanceBaseObstaculo = 0.75f; 
 
-    [Header("Ajustes de Rotação Inicial")]
-    public float rotacaoYArmario = 0f; 
+    // --- AGORA TEM CONTROLO TOTAL (X, Y e Z) SOBRE TUDO! ---
+    [Header("Ajustes de Rotação Inicial (X, Y, Z)")]
+    public Vector3 rotacaoArmario = new Vector3(0, 0, 0); 
+    public Vector3 rotacaoBarreira = new Vector3(0, 0, 0); 
     public Vector3 rotacaoPowerUp = new Vector3(0, 0, 0); 
 
     [Header("Configuração de Spawn de Moedas")]
@@ -45,17 +47,14 @@ public class GeradorObstaculos : MonoBehaviour
         if (pontosDeSpawn.Count == 0) ConfigurarPontos();
         if (pontosDeSpawn.Count == 0) return;
 
-        // 1. Escolhe a primeira pista bloqueada
         List<int> pistasBloqueadas = new List<int>();
         int pista1 = Random.Range(0, pontosDeSpawn.Count);
         pistasBloqueadas.Add(pista1);
         
-        // --- NOVO: A DIFICULDADE CRUEL ---
-        // Se a dificuldade passar de 1.5, tem 35% de chance de fechar DUAS pistas!
         if (GameManager.instance.dificuldade > 1.5f && Random.value < 0.35f)
         {
             int pista2 = Random.Range(0, pontosDeSpawn.Count);
-            while (pista2 == pista1) // Garante que a pista 2 seja diferente da pista 1
+            while (pista2 == pista1) 
             {
                 pista2 = Random.Range(0, pontosDeSpawn.Count);
             }
@@ -64,7 +63,6 @@ public class GeradorObstaculos : MonoBehaviour
 
         float chanceDoObstaculo = chanceBaseObstaculo + (GameManager.instance.dificuldade * 0.05f);
 
-        // 2. GERA OS OBSTÁCULOS
         if (Random.value < chanceDoObstaculo)
         {
             foreach (int p in pistasBloqueadas)
@@ -72,9 +70,16 @@ public class GeradorObstaculos : MonoBehaviour
                 if (pontosDeSpawn[p] != null)
                 {
                     GameObject obstaculoSorteado = prefabArmario;
-                    if (prefabBarreiraBaixa != null && Random.value > 0.5f) obstaculoSorteado = prefabBarreiraBaixa;
+                    Vector3 rotacaoSorteada = rotacaoArmario; // Usa o Vector3 completo
 
-                    GameObject obstaculo = Instantiate(obstaculoSorteado, pontosDeSpawn[p].position, Quaternion.Euler(0, rotacaoYArmario, 0));
+                    if (prefabBarreiraBaixa != null && Random.value > 0.5f) 
+                    {
+                        obstaculoSorteado = prefabBarreiraBaixa;
+                        rotacaoSorteada = rotacaoBarreira;
+                    }
+
+                    // Aplica a rotação exata que definir no Inspector
+                    GameObject obstaculo = Instantiate(obstaculoSorteado, pontosDeSpawn[p].position, Quaternion.Euler(rotacaoSorteada));
                     obstaculo.transform.SetParent(this.transform);
                     objetosInstanciados.Add(obstaculo);
                 }
@@ -83,10 +88,8 @@ public class GeradorObstaculos : MonoBehaviour
 
         bool jaSpawnouPoderAqui = false; 
 
-        // 3. GERA OS ITENS NAS PISTAS LIVRES
         for (int i = 0; i < pontosDeSpawn.Count; i++)
         {
-            // Verifica se a pista atual NÃO está na lista de bloqueadas
             if (!pistasBloqueadas.Contains(i) && pontosDeSpawn[i] != null)
             {
                 if (prefabPowerUp != null && GameManager.instance.deveSpawnarPowerUp && !jaSpawnouPoderAqui) 

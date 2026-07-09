@@ -121,6 +121,7 @@ public class GameManager : MonoBehaviour
         float recordeAtual = PlayerPrefs.GetFloat("MaiorPontuacao", 0f);
         if (pontuacao > recordeAtual) painelNovoRecorde.SetActive(true);
         else telaGameOver.SetActive(true);
+        GetComponent<AudioSource>().Stop();
     }
 
     public void SalvarRecorde()

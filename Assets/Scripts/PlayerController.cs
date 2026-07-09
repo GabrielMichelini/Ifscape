@@ -46,8 +46,11 @@ public class PlayerController : MonoBehaviour
         if (!GameManager.instance.jogoRodando) return;
 
         // --- SENSOR A LASER CONTRA ARMÁRIOS ---
+        // CORREÇÃO: O laser agora abaixa para não bater em pássaros/mesas durante a rasteira!
+        float alturaDoLaser = isRolling ? (rollHeight / 2f) : 0.5f;
+        
         RaycastHit hit;
-        if (Physics.Raycast(transform.position + Vector3.up * 0.5f, Vector3.forward, out hit, distanciaDeteccao))
+        if (Physics.Raycast(transform.position + Vector3.up * alturaDoLaser, Vector3.forward, out hit, distanciaDeteccao))
         {
             if (hit.collider.CompareTag("Obstaculo") || hit.collider.transform.root.CompareTag("Obstaculo"))
             {
@@ -124,21 +127,17 @@ public class PlayerController : MonoBehaviour
         StartCoroutine(RotinaInvencibilidade());
     }
 
-    // --- NOVA ROTINA: O EFEITO DE BRILHO (ESTRELA) ---
+    // --- ROTINA: O EFEITO DE BRILHO (ESTRELA) ---
     private IEnumerator RotinaInvencibilidade()
     {
         isInvencivel = true;
 
-        // Pega todas as partes do modelo 3D
         Renderer[] renderers = GetComponentsInChildren<Renderer>();
-        
-        // Dicionário para salvar as cores originais da roupa
         Dictionary<Material, Color> coresOriginais = new Dictionary<Material, Color>();
 
-        // Salva as cores originais antes de começar a piscar
         foreach (Renderer r in renderers)
         {
-            if (r.gameObject == this.gameObject) continue; // Pula o cubo fantasma
+            if (r.gameObject == this.gameObject) continue; 
             
             foreach (Material mat in r.materials)
             {
@@ -153,7 +152,6 @@ public class PlayerController : MonoBehaviour
         float velocidadePiscar = 0.15f; 
         bool corAlternada = false;
 
-        // Fica trocando de cor enquanto o tempo do poder não acabar
         while (tempoPassado < duracaoDoPoder)
         {
             foreach (Renderer r in renderers) 
@@ -164,18 +162,16 @@ public class PlayerController : MonoBehaviour
                 {
                     if (mat.HasProperty("_Color"))
                     {
-                        // Se for a vez de alternar, pinta de Amarelo. Se não, volta pra cor original.
                         mat.color = corAlternada ? Color.yellow : coresOriginais[mat]; 
                     }
                 }
             }
             
-            corAlternada = !corAlternada; // Inverte para a próxima piscada
+            corAlternada = !corAlternada; 
             yield return new WaitForSeconds(velocidadePiscar);
             tempoPassado += velocidadePiscar;
         }
 
-        // Quando o poder acaba, garante que todas as cores voltem ao normal!
         foreach (Renderer r in renderers) 
         {
             if (r.gameObject == this.gameObject) continue;

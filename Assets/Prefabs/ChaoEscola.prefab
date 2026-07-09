@@ -157,7 +157,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7244124678029382820}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.18, z: 0}
+  m_LocalPosition: {x: 0, y: -0.19, z: 0}
   m_LocalScale: {x: 10, y: 0.1, z: 25}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -251,16 +251,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9305c08d209dbaa478f2b72c1f35f838, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefabArmario: {fileID: 3040289247577919987, guid: bade0fff86c910f4d8278b9592fa397b,
+  prefabArmario: {fileID: 6835877326875273281, guid: a787084cbc2fa05488743128fa84d03e,
     type: 3}
-  prefabBarreiraBaixa: {fileID: 3040289247577919987, guid: bade0fff86c910f4d8278b9592fa397b,
+  prefabBarreiraBaixa: {fileID: 4311010213305465634, guid: 84062c9556b3cef4f8aa9a210cba155b,
     type: 3}
   prefabMoeda: {fileID: 5998957075273373501, guid: 10bce50abfce90e429fbf00b896fdb71,
     type: 3}
   prefabPowerUp: {fileID: 5844881792908368109, guid: 19b7d54fabdf1cf4f8c3b9079344c04e,
     type: 3}
   chanceBaseObstaculo: 1
-  rotacaoYArmario: 90
+  rotacaoArmario: {x: 0, y: 180, z: 0}
+  rotacaoBarreira: {x: 360, y: 180, z: 0}
   rotacaoPowerUp: {x: -90, y: 90, z: 0}
   moedasPorSequencia: 4
   espacamentoEntreMoedas: 2
